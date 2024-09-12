@@ -33,15 +33,23 @@
         <!-- Search & Filter -->
         <section class="task-filters">
             <input type="text" id="search-task" placeholder="Search task by title">
-            <button id="filter-all" class="btn-secondary">All</button>
-            <button id="filter-completed" class="btn-secondary">Completed</button>
-            <button id="filter-pending" class="btn-secondary">Pending</button>
+            <button id="filter-today" class="btn-secondary">Due Today</button>
+            <button id="filter-week" class="btn-secondary">Due This Week</button>
+            <button id="sort-priority" class="btn-secondary">Sort by Priority</button>
+        </section>
+
+        <!-- Category Tabs -->
+        <section class="category-tabs">
+            <button class="tab" onclick="filterByCategory('all')">All</button>
+            <button class="tab" onclick="filterByCategory('work')">Work</button>
+            <button class="tab" onclick="filterByCategory('personal')">Personal</button>
+            <button class="tab" onclick="filterByCategory('other')">Other</button>
         </section>
 
         <!-- Task List -->
         <section class="task-list">
             <h2>Task List</h2>
-            <div id="tasks-grid"></div>
+            <div id="tasks-grid" class="sortable-list"></div>
         </section>
 
         <!-- Analytics -->
@@ -51,6 +59,7 @@
             <p><strong>Pending Tasks:</strong> <span id="pending-count">0</span></p>
         </section>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sortablejs/1.14.0/Sortable.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
