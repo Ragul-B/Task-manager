@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Task Manager</h1>
+        </header>
+        
+        <section class="task-form">
+            <div class="form-group">
+                <input type="text" id="task-title" placeholder="Enter Task" required>
+                <input type="date" id="task-date" placeholder="Due Date">
+                <select id="task-priority">
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority</option>
+                </select>
+                <select id="task-category">
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="other">Other</option>
+                </select>
+                <button id="add-task-btn" class="btn-primary">Add Task</button>
+            </div>
+        </section>
+
+        <section class="task-list">
+            <h2>Task List</h2>
+            <div id="tasks-grid"></div>
+        </section>
+
+        <section class="task-filters">
+            <input type="text" id="search-task" placeholder="Search task">
+            <div class="filter-buttons">
+                <button id="filter-all" class="btn-secondary">All</button>
+                <button id="filter-completed" class="btn-secondary">Completed</button>
+                <button id="filter-pending" class="btn-secondary">Pending</button>
+            </div>
+        </section>
+
+        <section class="analytics">
+            <h3>Analytics</h3>
+            <p><strong>Completed Tasks:</strong> <span id="completed-count">0</span></p>
+            <p><strong>Pending Tasks:</strong> <span id="pending-count">0</span></p>
+        </section>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+  </html>
