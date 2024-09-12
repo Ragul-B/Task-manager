@@ -1,7 +1,5 @@
-// Initialize tasks from localStorage or an empty array
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-// Initialize sortable functionality
 Sortable.create(document.getElementById('tasks-grid'), {
     onEnd: function(event) {
         const movedTask = tasks[event.oldIndex];
@@ -12,7 +10,7 @@ Sortable.create(document.getElementById('tasks-grid'), {
     }
 });
 
-// Event listeners for form actions and filters
+// Event listeners
 document.getElementById('add-task-btn').addEventListener('click', addTask);
 document.getElementById('search-task').addEventListener('input', filterTasksByTitle);
 document.getElementById('filter-today').addEventListener('click', filterDueToday);
@@ -26,25 +24,78 @@ function addTask() {
     const priority = document.getElementById('task-priority').value;
     const category = document.getElementById('task-category').value;
 
-    if (title === '') {
-        alert('Task title cannot be empty!');
+    if (title === "") {
+        alert("Task title cannot be empty");
         return;
     }
 
     const task = {
-        id: Date.now(),
         title,
         date,
         priority,
         category,
-        completed: false
+        completed: false,
     };
 
     tasks.push(task);
     saveTasks();
     renderTasks();
     clearForm();
-    notifyDueTasks();
+}
+
+// Render tasks
+function renderTasks(filteredTasks = tasks) {
+    const tasksGrid = document.getElementById('tasks-grid');
+    tasksGrid.innerHTML = '';
+
+    filteredTasks.forEach((task, index) => {
+        const taskCard = document.createElement('div');
+        taskCard.classList.add('task-card');
+
+        const taskTitle = document.createElement('h3');
+        taskTitle.textContent = task.title;
+
+        const taskDate = document.createElement('p');
+        taskDate.textContent = task.date ? `Due: ${task.date}` : "No Due Date";
+
+        const taskPriority = document.createElement('p');
+        taskPriority.textContent = `Priority: ${task.priority}`;
+
+        const taskCategory = document.createElement('p');
+        taskCategory.textContent = `Category: ${task.category}`;
+
+        const taskActions = document.createElement('div');
+        taskActions.classList.add('task-actions');
+
+        const completeBtn = document.createElement('button');
+        completeBtn.textContent = task.completed ? "Undo" : "Complete";
+        completeBtn.classList.add('btn', 'btn-complete');
+        completeBtn.onclick = () => toggleCompleteTask(index);
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = "Edit";
+        editBtn.classList.add('btn', 'btn-edit');
+        editBtn.onclick = () => editTask(index);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = "Delete";
+        deleteBtn.classList.add('btn', 'btn-delete');
+        deleteBtn.onclick = () => deleteTask(index);
+
+        taskActions.appendChild(completeBtn);
+        taskActions.appendChild(editBtn);
+        taskActions.appendChild(deleteBtn);
+
+        taskCard.appendChild(taskTitle);
+        taskCard.appendChild(taskDate);
+        taskCard.appendChild(taskPriority);
+        taskCard.appendChild(taskCategory);
+        taskCard.appendChild(taskActions);
+
+        tasksGrid.appendChild(taskCard);
+    });
+
+    updateAnalytics();
 }
 
 // Save tasks to localStorage
@@ -52,191 +103,81 @@ function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-// Render tasks on the page
-function renderTasks(filter = 'all') {
-    const taskGrid = document.getElementById('tasks-grid');
-    taskGrid.innerHTML = '';
-
-    let filteredTasks = tasks;
-
-    if (filter === 'completed') {
-        filteredTasks = tasks.filter(task => task.completed);
-    } else if (filter === 'pending') {
-        filteredTasks = tasks.filter(task => !task.completed);
-    } else if (filter === 'today') {
-        const today = new Date().toISOString().split('T')[0];
-        filteredTasks = tasks.filter(task => task.date === today);
-    } else if (filter === 'week') {
-        const startOfWeek = new Date();
-        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-        const endOfWeek = new Date();
-        endOfWeek.setDate(endOfWeek.getDate() + (6 - endOfWeek.getDay()));
-        filteredTasks = tasks.filter(task => {
-            const taskDate = new Date(task.date);
-            return taskDate >= startOfWeek && taskDate <= endOfWeek;
-        });
-    }
-
-    filteredTasks.forEach(task => {
-        const taskCard = document.createElement('div');
-        taskCard.classList.add('task-card');
-        taskCard.innerHTML = `
-            <h3>${task.title}</h3>
-            <p>Due: ${task.date}</p>
-            <p>Priority: ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</p>
-            <p>Category: ${task.category.charAt(0).toUpperCase() + task.category.slice(1)}</p>
-            <div class="task-actions">
-                <button class="btn btn-edit" onclick="editTask(${task.id})">Edit</button>
-                <button class="btn btn-complete" onclick="toggleTaskCompletion(${task.id})">
-                    ${task.completed ? 'Mark as Pending' : 'Mark as Completed'}
-                </button>
-                <button class="btn btn-delete" onclick="deleteTask(${task.id})">Delete</button>
-            </div>
-        `;
-        taskGrid.appendChild(taskCard);
-    });
-
-    updateAnalytics();
-}
-
-// Toggle task completion status
-function toggleTaskCompletion(id) {
-    const taskIndex = tasks.findIndex(task => task.id === id);
-    tasks[taskIndex].completed = !tasks[taskIndex].completed;
-    saveTasks();
-    renderTasks();
-}
-
-// Delete a task
-function deleteTask(id) {
-    tasks = tasks.filter(task => task.id !== id);
-    saveTasks();
-    renderTasks();
-}
-
-// Search tasks by title
-function filterTasksByTitle() {
-    const searchTerm = document.getElementById('search-task').value.toLowerCase();
-    const filteredTasks = tasks.filter(task => task.title.toLowerCase().includes(searchTerm));
-    renderFilteredTasks(filteredTasks);
-}
-
-// Render filtered tasks
-function renderFilteredTasks(filteredTasks) {
-    const taskGrid = document.getElementById('tasks-grid');
-    taskGrid.innerHTML = '';
-
-    filteredTasks.forEach(task => {
-        const taskCard = document.createElement('div');
-        taskCard.classList.add('task-card');
-        taskCard.innerHTML = `
-            <h3>${task.title}</h3>
-            <p>Due: ${task.date}</p>
-            <p>Priority: ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</p>
-            <p>Category: ${task.category.charAt(0).toUpperCase() + task.category.slice(1)}</p>
-            <div class="task-actions">
-                <button class="btn btn-edit" onclick="editTask(${task.id})">Edit</button>
-                <button class="btn btn-complete" onclick="toggleTaskCompletion(${task.id})">
-                    ${task.completed ? 'Mark as Pending' : 'Mark as Completed'}
-                </button>
-                <button class="btn btn-delete" onclick="deleteTask(${task.id})">Delete</button>
-            </div>
-        `;
-        taskGrid.appendChild(taskCard);
-    });
-}
-
-// Filter tasks by category
-function filterByCategory(category) {
-    if (category === 'all') {
-        renderTasks();
-    } else {
-        const filteredTasks = tasks.filter(task => task.category === category);
-        renderFilteredTasks(filteredTasks);
-    }
-}
-
-// Filter tasks due today
-function filterDueToday() {
-    renderTasks('today');
-}
-
-// Filter tasks due this week
-function filterDueThisWeek() {
-    renderTasks('week');
-}
-
-// Sort tasks by priority
-function sortByPriority() {
-    tasks.sort((a, b) => {
-        const priorityOrder = { 'low': 1, 'medium': 2, 'high': 3 };
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
-    });
-    saveTasks();
-    renderTasks();
-}
-
-// Update task analytics
-function updateAnalytics() {
-    const completedTasks = tasks.filter(task => task.completed).length;
-    const pendingTasks = tasks.filter(task => !task.completed).length;
-
-    document.getElementById('completed-count').innerText = completedTasks;
-    document.getElementById('pending-count').innerText = pendingTasks;
-}
-
-// Notify user about tasks close to their due dates
-function notifyDueTasks() {
-    const now = new Date();
-    tasks.forEach(task => {
-        const taskDate = new Date(task.date);
-        const daysLeft = Math.ceil((taskDate - now) / (1000 * 60 * 60 * 24));
-        if (daysLeft >= 0 && daysLeft <= 1) {
-            if (Notification.permission === 'granted') {
-                new Notification('Task Due Soon', {
-                    body: `${task.title} is due on ${task.date}.`
-                });
-            } else if (Notification.permission !== 'denied') {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        new Notification('Task Due Soon', {
-                            body: `${task.title} is due on ${task.date}.`
-                        });
-                    }
-                });
-            }
-        }
-    });
-}
-
-// Edit task details
-function editTask(id) {
-    const taskIndex = tasks.findIndex(task => task.id === id);
-    const task = tasks[taskIndex];
+// Edit a task
+function editTask(index) {
+    const task = tasks[index];
 
     document.getElementById('task-title').value = task.title;
     document.getElementById('task-date').value = task.date;
     document.getElementById('task-priority').value = task.priority;
     document.getElementById('task-category').value = task.category;
 
-    document.getElementById('add-task-btn').textContent = 'Update Task';
-    document.getElementById('add-task-btn').removeEventListener('click', addTask);
-    document.getElementById('add-task-btn').addEventListener('click', function updateTask() {
-        task.title = document.getElementById('task-title').value.trim();
-        task.date = document.getElementById('task-date').value;
-        task.priority = document.getElementById('task-priority').value;
-        task.category = document.getElementById('task-category').value;
-
-        saveTasks();
-        renderTasks();
-        clearForm();
-        document.getElementById('add-task-btn').textContent = 'Add Task';
-        document.getElementById('add-task-btn').removeEventListener('click', updateTask);
-        document.getElementById('add-task-btn').addEventListener('click', addTask);
-    });
+    deleteTask(index);
 }
 
-// Clear the task form after adding or editing
+// Delete a task
+function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
+}
+
+// Toggle task completion
+function toggleCompleteTask(index) {
+    tasks[index].completed = !tasks[index].completed;
+    saveTasks();
+    renderTasks();
+}
+
+// Filter tasks by title
+function filterTasksByTitle() {
+    const searchQuery = document.getElementById('search-task').value.toLowerCase();
+    const filteredTasks = tasks.filter(task =>
+        task.title.toLowerCase().includes(searchQuery)
+    );
+    renderTasks(filteredTasks);
+}
+
+// Filter tasks due today
+function filterDueToday() {
+    const today = new Date().toISOString().split('T')[0];
+    const filteredTasks = tasks.filter(task => task.date === today);
+    renderTasks(filteredTasks);
+}
+
+// Filter tasks due this week
+function filterDueThisWeek() {
+    const today = new Date();
+    const oneWeekLater = new Date(today);
+    oneWeekLater.setDate(today.getDate() + 7);
+
+    const filteredTasks = tasks.filter(task => {
+        const taskDate = new Date(task.date);
+        return taskDate >= today && taskDate <= oneWeekLater;
+    });
+
+    renderTasks(filteredTasks);
+}
+
+// Sort tasks by priority
+function sortByPriority() {
+    const priorityLevels = { "high": 1, "medium": 2, "low": 3 };
+    tasks.sort((a, b) => priorityLevels[a.priority] - priorityLevels[b.priority]);
+    saveTasks();
+    renderTasks();
+}
+
+// Filter tasks by category
+function filterByCategory(category) {
+    if (category === 'all') {
+        renderTasks(tasks);
+    } else {
+        const filteredTasks = tasks.filter(task => task.category === category);
+        renderTasks(filteredTasks);
+    }
+}
+
+// Clear form after adding/editing a task
 function clearForm() {
     document.getElementById('task-title').value = '';
     document.getElementById('task-date').value = '';
@@ -244,10 +185,14 @@ function clearForm() {
     document.getElementById('task-category').value = 'work';
 }
 
-// Initial rendering of tasks
-renderTasks();
+// Update analytics (completed/pending tasks)
+function updateAnalytics() {
+    const completedCount = tasks.filter(task => task.completed).length;
+    const pendingCount = tasks.length - completedCount;
 
-// Ensure that notifications are requested if the user hasn't yet granted permission
-if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-    Notification.requestPermission();
+    document.getElementById('completed-count').textContent = completedCount;
+    document.getElementById('pending-count').textContent = pendingCount;
 }
+
+// Initial render
+renderTasks();
