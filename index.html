@@ -8,14 +8,12 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header>
-            <h1>Task Manager</h1>
+            <h1>Advanced Task Manager</h1>
         </header>
 
-        <!-- Task Form -->
         <section class="task-form">
-            <input type="text" id="task-title" placeholder="Enter Task Title" required>
+            <input type="text" id="task-title" placeholder="Task Title" required>
             <input type="date" id="task-date" placeholder="Due Date">
             <select id="task-priority">
                 <option value="low">Low Priority</option>
@@ -30,15 +28,13 @@
             <button id="add-task-btn">Add Task</button>
         </section>
 
-        <!-- Search & Filter -->
         <section class="task-filters">
-            <input type="text" id="search-task" placeholder="Search task by title">
-            <button id="filter-today" class="btn-secondary">Due Today</button>
-            <button id="filter-week" class="btn-secondary">Due This Week</button>
-            <button id="sort-priority" class="btn-secondary">Sort by Priority</button>
+            <input type="text" id="search-task" placeholder="Search tasks by title">
+            <button id="filter-today">Due Today</button>
+            <button id="filter-week">Due This Week</button>
+            <button id="sort-priority">Sort by Priority</button>
         </section>
 
-        <!-- Category Tabs -->
         <section class="category-tabs">
             <button class="tab" onclick="filterByCategory('all')">All</button>
             <button class="tab" onclick="filterByCategory('work')">Work</button>
@@ -46,17 +42,15 @@
             <button class="tab" onclick="filterByCategory('other')">Other</button>
         </section>
 
-        <!-- Task List -->
         <section class="task-list">
             <h2>Task List</h2>
             <div id="tasks-grid" class="sortable-list"></div>
         </section>
 
-        <!-- Analytics -->
         <section class="analytics">
             <h3>Task Analytics</h3>
-            <p><strong>Completed Tasks:</strong> <span id="completed-count">0</span></p>
-            <p><strong>Pending Tasks:</strong> <span id="pending-count">0</span></p>
+            <p>Completed Tasks: <span id="completed-count">0</span></p>
+            <p>Pending Tasks: <span id="pending-count">0</span></p>
         </section>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sortablejs/1.14.0/Sortable.min.js"></script>
