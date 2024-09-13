@@ -1,15 +1,5 @@
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-Sortable.create(document.getElementById('tasks-grid'), {
-    onEnd: function(event) {
-        const movedTask = tasks[event.oldIndex];
-        tasks.splice(event.oldIndex, 1);
-        tasks.splice(event.newIndex, 0, movedTask);
-        saveTasks();
-        renderTasks();
-    }
-});
-
 // Event listeners
 document.getElementById('add-task-btn').addEventListener('click', addTask);
 document.getElementById('search-task').addEventListener('input', filterTasksByTitle);
