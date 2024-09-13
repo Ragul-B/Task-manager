@@ -49,6 +49,7 @@ h1, h2 {
 
 canvas {
   margin-top: 20px;
+  height: 200px;
 }
 
 .transaction-form, .filter, .transaction-history {
