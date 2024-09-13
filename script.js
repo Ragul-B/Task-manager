@@ -7,9 +7,6 @@ const filterTypeEl = document.getElementById('filter-type');
 const filterCategoryEl = document.getElementById('filter-category');
 const startDateEl = document.getElementById('filter-start-date');
 const endDateEl = document.getElementById('filter-end-date');
-const modalEl = document.getElementById('modal');
-const confirmDeleteEl = document.getElementById('confirm-delete');
-const cancelDeleteEl = document.getElementById('cancel-delete');
 
 // Form Elements
 const descriptionEl = document.getElementById('description');
@@ -23,8 +20,6 @@ const transactionIdEl = document.getElementById('transaction-id');
 
 // Transactions Array
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-let deleteIndex = null;
-let chart, categoryChart;
 
 // Update Summary
 function updateSummary() {
@@ -67,7 +62,7 @@ function renderTransactions(filter = 'all', startDate = null, endDate = null, ca
       ${transaction.description} - ${transaction.category} (${transaction.date}) 
       <span>$${transaction.amount.toFixed(2)}</span>
       <button onclick="editTransaction(${index})">Edit</button>
-      <button onclick="openDeleteModal(${index})">Delete</button>
+      <button onclick="deleteTransaction(${index})">Delete</button>
     `;
 
     transactionListEl.appendChild(li);
@@ -118,23 +113,12 @@ function addTransaction(e) {
   }
 }
 
-// Delete Transaction (with Modal Confirmation)
-function openDeleteModal(index) {
-  deleteIndex = index;
-  modalEl.style.display = 'flex';
-}
-
-function confirmDeleteTransaction() {
-  transactions.splice(deleteIndex, 1);
+// Delete Transaction
+function deleteTransaction(index) {
+  transactions.splice(index, 1);
   localStorage.setItem('transactions', JSON.stringify(transactions));
-  closeModal();
   updateSummary();
   renderTransactions();
-}
-
-function closeModal() {
-  modalEl.style.display = 'none';
-  deleteIndex = null;
 }
 
 // Edit Transaction
@@ -162,7 +146,7 @@ cancelEditEl.addEventListener('click', () => {
   cancelEditEl.style.display = 'none';
 });
 
-// Update Income/Expense and Category Charts
+// Update Charts (Income vs Expense and Category Breakdown)
 function updateCharts(income, expense) {
   const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
   const categories = transactions.filter(t => t.type === 'expense').reduce((acc, cur) => {
@@ -170,8 +154,9 @@ function updateCharts(income, expense) {
     return acc;
   }, {});
 
+  // Income vs Expense Doughnut Chart
   if (chart) {
-    chart.destroy(); // Destroy the previous chart before creating a new one
+    chart.destroy();
   }
 
   chart = new Chart(ctx, {
@@ -192,7 +177,7 @@ function updateCharts(income, expense) {
     }
   });
 
-  // Category Breakdown Chart
+  // Category Breakdown Pie Chart
   const categoryCtx = document.getElementById('categoryBreakdownChart').getContext('2d');
   if (categoryChart) {
     categoryChart.destroy();
@@ -239,8 +224,6 @@ filterTypeEl.addEventListener('change', applyFilters);
 startDateEl.addEventListener('change', applyFilters);
 endDateEl.addEventListener('change', applyFilters);
 filterCategoryEl.addEventListener('change', applyFilters);
-confirmDeleteEl.addEventListener('click', confirmDeleteTransaction);
-cancelDeleteEl.addEventListener('click', closeModal);
 
 // On Load
-init();
+init(); 
