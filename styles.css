@@ -47,6 +47,10 @@ h1, h2 {
   color: #dc3545;
 }
 
+canvas {
+  margin-top: 20px;
+}
+
 .transaction-form, .filter, .transaction-history {
   margin-top: 20px;
 }
@@ -75,6 +79,14 @@ button:hover {
   background-color: #0056b3;
 }
 
+#cancel-edit {
+  background-color: #dc3545;
+}
+
+#cancel-edit:hover {
+  background-color: #c82333;
+}
+
 .transaction-history ul {
   list-style-type: none;
   padding: 0;
@@ -98,13 +110,63 @@ button:hover {
   border-left-color: #dc3545;
 }
 
+.transaction-history li button {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.transaction-history li button:hover {
+  color: #0056b3;
+}
+
 .filter select, .filter input {
   width: 100%;
   padding: 10px;
   font-size: 16px;
 }
 
-.chart-container {
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
   width: 100%;
-  margin: 20px 0;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content button {
+  margin: 10px;
+  padding: 10px 20px;
+}
+
+.modal-content button#confirm-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.modal-content button#confirm-delete:hover {
+  background-color: #c82333;
+}
+
+.modal-content button#cancel-delete {
+  background-color: #007bff;
+  color: white;
+}
+
+.modal-content button#cancel-delete:hover {
+  background-color: #0056b3;
 }
