@@ -1,64 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Task Manager</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Manager</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Advanced Task Manager</h1>
-        </header>
+  <div class="container">
+    <h1>Money Manager</h1>
 
-        <!-- Task Form -->
-        <section class="task-form">
-            <input type="text" id="task-title" placeholder="Task Title" required>
-            <input type="date" id="task-date" placeholder="Due Date">
-            <select id="task-priority">
-                <option value="low">Low Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="high">High Priority</option>
-            </select>
-            <select id="task-category">
-                <option value="work">Work</option>
-                <option value="personal">Personal</option>
-                <option value="other">Other</option>
-            </select>
-            <button id="add-task-btn">Add Task</button>
-        </section>
-
-        <!-- Filters and Sorting -->
-        <section class="task-filters">
-            <input type="text" id="search-task" placeholder="Search tasks by title">
-            <button id="filter-today">Due Today</button>
-            <button id="filter-week">Due This Week</button>
-            <button id="sort-priority">Sort by Priority</button>
-        </section>
-
-        <!-- Category Tabs -->
-        <section class="category-tabs">
-            <button class="tab" onclick="filterByCategory('all')">All</button>
-            <button class="tab" onclick="filterByCategory('work')">Work</button>
-            <button class="tab" onclick="filterByCategory('personal')">Personal</button>
-            <button class="tab" onclick="filterByCategory('other')">Other</button>
-        </section>
-
-        <!-- Task List -->
-        <section class="task-list">
-            <h2>Task List</h2>
-            <div id="tasks-grid" class="sortable-list"></div>
-        </section>
-
-        <!-- Analytics -->
-        <section class="analytics">
-            <h3>Task Analytics</h3>
-            <p>Completed Tasks: <span id="completed-count">0</span></p>
-            <p>Pending Tasks: <span id="pending-count">0</span></p>
-        </section>
+    <div class="budget-summary">
+      <h2>Budget Summary</h2>
+      <div id="balance">Balance: $0.00</div>
+      <div class="income-expense">
+        <div>Income: <span id="total-income">$0.00</span></div>
+        <div>Expense: <span id="total-expense">$0.00</span></div>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <div class="transaction-form">
+      <h2>Add Transaction</h2>
+      <form id="transaction-form">
+        <input type="text" id="description" placeholder="Description" required>
+        <input type="number" id="amount" placeholder="Amount" required>
+        <select id="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <button type="submit">Add Transaction</button>
+      </form>
+    </div>
+
+    <div class="filter">
+      <h2>Filter Transactions</h2>
+      <select id="filter-type">
+        <option value="all">All</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+
+    <div class="transaction-history">
+      <h2>Transaction History</h2>
+      <ul id="transaction-list"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
