@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Money Manager</title>
+  <title>Advanced Money Manager</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>Money Manager</h1>
+    <h1>Advanced Money Manager</h1>
 
     <div class="budget-summary">
       <h2>Budget Summary</h2>
@@ -19,11 +20,21 @@
       </div>
     </div>
 
+    <canvas id="incomeExpenseChart"></canvas>
+
     <div class="transaction-form">
       <h2>Add Transaction</h2>
       <form id="transaction-form">
         <input type="text" id="description" placeholder="Description" required>
         <input type="number" id="amount" placeholder="Amount" required>
+        <input type="date" id="date" required>
+        <select id="category">
+          <option value="Salary">Salary</option>
+          <option value="Rent">Rent</option>
+          <option value="Food">Food</option>
+          <option value="Utilities">Utilities</option>
+          <option value="Other">Other</option>
+        </select>
         <select id="type">
           <option value="income">Income</option>
           <option value="expense">Expense</option>
@@ -39,6 +50,10 @@
         <option value="income">Income</option>
         <option value="expense">Expense</option>
       </select>
+
+      <h3>Filter by Date</h3>
+      <input type="date" id="filter-start-date">
+      <input type="date" id="filter-end-date">
     </div>
 
     <div class="transaction-history">
