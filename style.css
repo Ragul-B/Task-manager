@@ -199,18 +199,3 @@ header h1 {
     font-size: 1.2rem;
     color: #007bff;
 }
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .task-form {
-        flex-direction: column;
-    }
-
-    .task-filters {
-        flex-direction: column;
-    }
-
-    .task-filters input {
-        width: 100%;
-    }
-    }
