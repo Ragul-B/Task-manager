@@ -4,19 +4,12 @@ const totalIncomeEl = document.getElementById('total-income');
 const totalExpenseEl = document.getElementById('total-expense');
 const transactionListEl = document.getElementById('transaction-list');
 const filterTypeEl = document.getElementById('filter-type');
-const filterCategoryEl = document.getElementById('filter-category');
-const startDateEl = document.getElementById('filter-start-date');
-const endDateEl = document.getElementById('filter-end-date');
 
 // Form Elements
 const descriptionEl = document.getElementById('description');
 const amountEl = document.getElementById('amount');
-const dateEl = document.getElementById('date');
-const categoryEl = document.getElementById('category');
 const typeEl = document.getElementById('type');
 const transactionFormEl = document.getElementById('transaction-form');
-const cancelEditEl = document.getElementById('cancel-edit');
-const transactionIdEl = document.getElementById('transaction-id');
 
 // Transactions Array
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -36,183 +29,63 @@ function updateSummary() {
   balanceEl.innerText = `Balance: $${balance.toFixed(2)}`;
   totalIncomeEl.innerText = `$${income.toFixed(2)}`;
   totalExpenseEl.innerText = `$${expense.toFixed(2)}`;
-
-  updateCharts(income, expense);
 }
 
 // Render Transactions
-function renderTransactions(filter = 'all', startDate = null, endDate = null, categoryFilter = 'all') {
+function renderTransactions(filter = 'all') {
   transactionListEl.innerHTML = '';
 
-  const filteredTransactions = transactions.filter(transaction => {
-    if (filter !== 'all' && transaction.type !== filter) return false;
-    if (categoryFilter !== 'all' && transaction.category !== categoryFilter) return false;
+  const filteredTransactions = transactions.filter(transaction => 
+    filter === 'all' || transaction.type === filter
+  );
 
-    if (startDate && new Date(transaction.date) < new Date(startDate)) return false;
-    if (endDate && new Date(transaction.date) > new Date(endDate)) return false;
-
-    return true;
-  });
-
-  filteredTransactions.forEach((transaction, index) => {
+  filteredTransactions.forEach(transaction => {
     const li = document.createElement('li');
     li.classList.add(transaction.type);
     
     li.innerHTML = `
-      ${transaction.description} - ${transaction.category} (${transaction.date}) 
-      <span>$${transaction.amount.toFixed(2)}</span>
-      <button onclick="editTransaction(${index})">Edit</button>
-      <button onclick="deleteTransaction(${index})">Delete</button>
+      ${transaction.description} <span>$${transaction.amount.toFixed(2)}</span>
     `;
 
     transactionListEl.appendChild(li);
   });
 }
 
-// Add or Edit Transaction
+// Add Transaction
 function addTransaction(e) {
   e.preventDefault();
 
   const description = descriptionEl.value;
   const amount = parseFloat(amountEl.value);
-  const date = dateEl.value;
-  const category = categoryEl.value;
   const type = typeEl.value;
-  const transactionId = transactionIdEl.value;
 
-  if (description && amount && date) {
+  if (description && amount) {
     const transaction = {
       description,
       amount,
-      date,
-      category,
       type
     };
 
-    if (transactionId) {
-      transactions[transactionId] = transaction; // Edit existing transaction
-    } else {
-      transactions.push(transaction); // Add new transaction
-    }
-
+    transactions.push(transaction);
     localStorage.setItem('transactions', JSON.stringify(transactions));
 
     descriptionEl.value = '';
     amountEl.value = '';
-    dateEl.value = '';
-    categoryEl.value = 'Salary';
     typeEl.value = 'income';
-    transactionIdEl.value = '';
-
-    cancelEditEl.style.display = 'none';
 
     updateSummary();
     renderTransactions();
   } else {
-    alert('Please fill out all fields');
+    alert('Please provide a description and amount');
   }
 }
 
-// Delete Transaction
-function deleteTransaction(index) {
-  transactions.splice(index, 1);
-  localStorage.setItem('transactions', JSON.stringify(transactions));
-  updateSummary();
-  renderTransactions();
-}
-
-// Edit Transaction
-function editTransaction(index) {
-  const transaction = transactions[index];
-  descriptionEl.value = transaction.description;
-  amountEl.value = transaction.amount;
-  dateEl.value = transaction.date;
-  categoryEl.value = transaction.category;
-  typeEl.value = transaction.type;
-  transactionIdEl.value = index;
-
-  cancelEditEl.style.display = 'inline';
-}
-
-// Cancel Editing
-cancelEditEl.addEventListener('click', () => {
-  descriptionEl.value = '';
-  amountEl.value = '';
-  dateEl.value = '';
-  categoryEl.value = 'Salary';
-  typeEl.value = 'income';
-  transactionIdEl.value = '';
-
-  cancelEditEl.style.display = 'none';
+// Filter Transactions
+filterTypeEl.addEventListener('change', function() {
+  renderTransactions(this.value);
 });
 
-// Update Charts (Income vs Expense and Category Breakdown)
-function updateCharts(income, expense) {
-  const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
-  const categories = transactions.filter(t => t.type === 'expense').reduce((acc, cur) => {
-    acc[cur.category] = (acc[cur.category] || 0) + cur.amount;
-    return acc;
-  }, {});
-
-  // Income vs Expense Doughnut Chart
-  if (chart) {
-    chart.destroy();
-  }
-
-  chart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Income', 'Expense'],
-      datasets: [{
-        label: 'Income vs Expense',
-        data: [income, expense],
-        backgroundColor: ['#28a745', '#dc3545'],
-        borderColor: ['#28a745', '#dc3545'],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-    }
-  });
-
-  // Category Breakdown Pie Chart
-  const categoryCtx = document.getElementById('categoryBreakdownChart').getContext('2d');
-  if (categoryChart) {
-    categoryChart.destroy();
-  }
-
-  categoryChart = new Chart(categoryCtx, {
-    type: 'pie',
-    data: {
-      labels: Object.keys(categories),
-      datasets: [{
-        label: 'Expense by Category',
-        data: Object.values(categories),
-        backgroundColor: ['#ffcc00', '#ff6600', '#ff0066', '#cc00ff', '#6600ff'],
-        borderColor: ['#ffcc00', '#ff6600', '#ff0066', '#cc00ff', '#6600ff'],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-    }
-  });
-}
-
-// Apply Filters for Transactions
-function applyFilters() {
-  const filterType = filterTypeEl.value;
-  const startDate = startDateEl.value;
-  const endDate = endDateEl.value;
-  const categoryFilter = filterCategoryEl.value;
-
-  renderTransactions(filterType, startDate, endDate, categoryFilter);
-}
-
-// Initialize the application
+// Initialize
 function init() {
   renderTransactions();
   updateSummary();
@@ -220,10 +93,6 @@ function init() {
 
 // Event Listeners
 transactionFormEl.addEventListener('submit', addTransaction);
-filterTypeEl.addEventListener('change', applyFilters);
-startDateEl.addEventListener('change', applyFilters);
-endDateEl.addEventListener('change', applyFilters);
-filterCategoryEl.addEventListener('change', applyFilters);
 
 // On Load
-init(); 
+init();
